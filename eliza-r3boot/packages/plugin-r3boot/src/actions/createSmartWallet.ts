@@ -18,7 +18,7 @@ export class CreateSmartWallet {
             throw new Error("WALLET_PRIVATE_KEY is not defined in the environment variables.");
         }
 
-        const primeSdk = new PrimeSdk({ privateKey }, { chainId: 5000, projectKey: "" });
+        const primeSdk = new PrimeSdk({ privateKey }, { chainId: 5000});
         const address = await primeSdk.getCounterFactualAddress();
 
         console.log("\x1b[33m%s\x1b[0m", `EtherspotWallet address: ${address}`);
