@@ -1,6 +1,6 @@
 {
   "name": "R3boot",
-  "plugins": [],
+  "plugins": ["@elizaos/plugin-r3boot"],
   "clients": [],
   "modelProvider": "grok",
   "settings": {
