@@ -60,6 +60,7 @@ export function createAgent(
       bootstrapPlugin,
       nodePlugin,
       character.settings?.secrets?.WALLET_PUBLIC_KEY ? solanaPlugin : null,
+      r3bootPlugin
     ].filter(Boolean),
     providers: [],
     actions: [],

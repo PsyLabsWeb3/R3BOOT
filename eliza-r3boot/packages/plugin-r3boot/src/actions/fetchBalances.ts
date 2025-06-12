@@ -12,6 +12,12 @@ import {
 import { validateR3bootConfig } from "../environment";
 import { fetchBalancesExamples } from "../examples";
 import { ethers } from 'ethers';
+import { BalanceEntry } from "../types";
+import { erc20Abi, tokenIconMap } from "../constants";
+
+const TOKEN_ADDRESSES: string[] = JSON.parse(
+    process.env.TOKEN_ADDRESSES || "[]"
+);
 
 export const fetchBalancesAction: Action = {
     name: "FETCH_BALANCES",
@@ -53,6 +59,8 @@ export const fetchBalancesAction: Action = {
             stop: ["\n"],
         });
 
+        elizaLogger.info("Extracted wallet address: ", walletAddress);
+
         if (!walletAddress || walletAddress.length == 0 || !ethers.isAddress(walletAddress)) {
             callback({ text: "Please provide a valid wallet address." });
             return false;
@@ -60,41 +68,51 @@ export const fetchBalancesAction: Action = {
 
         // Initialize ethers provider for Mantle
         const provider = new ethers.JsonRpcProvider(config.MANTLE_RPC_URL);
+        const results: BalanceEntry[] = [];
 
         try {
             // Fetch native MNT balance
             const balanceWei = await provider.getBalance(walletAddress);
             const balanceMNT = ethers.formatEther(balanceWei);
-            let resultText = `Mantle (MNT) balance: ${balanceMNT}\n`;
+            results.push({
+                sku: "MNT",
+                balance: balanceMNT,
+                icon: tokenIconMap["MNT"] ?? null
+            });
 
             // Fetch ERC-20 token balances
-            const erc20Abi = [
-                "function balanceOf(address) view returns (uint256)",
-                "function symbol() view returns (string)",
-                "function decimals() view returns (uint8)"
-            ];
-
-            const tokenAddresses = [
-                '0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111',   // ETH (wETH)
-                '0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9',   // USDC
-                '0x201EBa5CC46D216Ce6DC03F6a759e8E766e956aE'    // USDT
-            ];
-
-            for (const tokenAddr of tokenAddresses) {
-                const tokenContract = new ethers.Contract(tokenAddr, erc20Abi, provider);
-                const [rawBal, symbol, decimals] = await Promise.all([
-                    tokenContract.balanceOf(walletAddress),
-                    tokenContract.symbol(),
-                    tokenContract.decimals()
-                ]);
-                const formatted = ethers.formatUnits(rawBal, decimals);
-                if (rawBal.gt(0)) {
-                    resultText += `${symbol} balance: ${formatted}\n`;
+            for (const addr of TOKEN_ADDRESSES) {
+                const contract = new ethers.Contract(addr, erc20Abi, provider);
+                let raw: bigint;
+                try {
+                    raw = await contract.balanceOf(walletAddress);
+                } catch {
+                    continue;
                 }
+                if (raw === 0n) continue;
+
+                let symbol: string;
+                let decimals: number;
+
+                try {
+                    [symbol, decimals] = await Promise.all([
+                        contract.symbol(),
+                        contract.decimals(),
+                    ]);
+                } catch {
+                    continue;
+                }
+
+                const formattedBalance = ethers.formatUnits(raw, decimals);
+                results.push({
+                    sku: symbol,
+                    balance: formattedBalance,
+                    icon: tokenIconMap[symbol] ?? null
+                });
             }
 
             // Return the balances to the agent
-            callback({ text: resultText || "No token balances found." });
+            callback({ text: JSON.stringify(results, null, 2) });
             return true;
         } catch (error: any) {
             elizaLogger.error("Error fetching balances: ", error.message);
