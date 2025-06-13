@@ -22,9 +22,9 @@
     "@elizaos/plugin-bootstrap": "0.1.9",
     "@elizaos/plugin-image-generation": "0.1.9",
     "@elizaos/plugin-node": "0.1.9",
+    "@elizaos/plugin-r3boot": "workspace:*",
     "@elizaos/plugin-solana": "0.1.9",
     "@elizaos/plugin-starknet": "0.1.9",
-    "@elizaos/plugin-r3boot": "workspace:*",
     "@tavily/core": "0.0.2",
     "amqplib": "0.10.5",
     "better-sqlite3": "11.5.0",
@@ -44,6 +44,7 @@
       "onnxruntime-node": "1.20.0"
     },
     "onlyBuiltDependencies": [
+      "@biomejs/biome",
       "@discordjs/opus",
       "@elizaos/plugin-node",
       "better-sqlite3",
@@ -69,6 +70,7 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "20.11.30",
     "pm2": "5.4.3",
     "ts-node": "10.9.2",
     "tsup": "8.3.5",
