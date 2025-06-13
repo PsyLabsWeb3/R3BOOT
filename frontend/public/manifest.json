@@ -1,0 +1,25 @@
+{
+  "short_name": "R3BOOT",
+  "name": "R3BOOT",
+  "icons": [
+    {
+      "src": "/img/icon_r3boot.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/img/icon_r3boot.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/icon_r3boot.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e7e7e7",
+  "theme_color": "#000000"
+}

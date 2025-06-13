@@ -1,0 +1,20 @@
+.circle-loader {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #000; /* negro por default */
+  border-top: 4px solid rgba(99, 102, 241, 0.0); /* azul transparente *//* azul visible */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+  background: transparent;
+}
+
+.dark .circle-loader {
+  border: 4px solid #fff; /* blanco en darkmode */
+  border-top: 4px solid rgba(99, 102, 241, 0.0);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
