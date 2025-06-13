@@ -32,3 +32,51 @@ export const fetchBalancesExamples: ActionExample[][] = [
         }
     ],
 ];
+
+export const createSmartWalletExamples: ActionExample[][] = [
+    [
+        {
+            user: "{{user1}}",
+            content: {
+                text: "Can you create a smart wallet for me?",
+            },
+        },
+        {
+            user: "{{agent}}",
+            content: {
+                text: "Sure, I will create a smart wallet for you. Your smart wallet address is 0x1234567890abcdef1234567890abcdef12345678",
+                action: "CREATE_SMART_WALLET",
+            },
+        }
+    ],
+    [
+        {
+            user: "{{user1}}",
+            content: {
+                text: "I need a new smart wallet. Can you set it up?",
+            },
+        },
+        {
+            user: "{{agent}}",
+            content: {
+                text: "Let me set up a new smart wallet for you. Your smart wallet address is 0x1234567890abcdef1234567890abcdef12345678",
+                action: "CREATE_SMART_WALLET",
+            },
+        }
+    ],
+    [
+        {
+            user: "{{user1}}",
+            content: {
+                text: "Please create a smart wallet for my transactions.",
+            },
+        },
+        {
+            user: "{{agent}}",
+            content: {
+                text: "Creating a smart wallet for your transactions. Your smart wallet address is 0x1234567890abcdef1234567890abcdef12345678",
+                action: "CREATE_SMART_WALLET",
+            },
+        }
+    ],
+];

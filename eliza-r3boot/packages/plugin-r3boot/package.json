@@ -20,6 +20,7 @@
 	],
 	"dependencies": {
 		"@elizaos/core": "0.1.9",
+		"@etherspot/prime-sdk": "^1.9.2",
 		"ethers": "^6.14.3",
 		"tsup": "8.3.5",
 		"zod": "3.22.4"
