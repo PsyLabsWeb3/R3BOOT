@@ -49,12 +49,18 @@ export const onRamp: Action = {
             };
 
             const primeSdk = new PrimeSdk({ privateKey: process.env.WALLET_PRIVATE_KEY }, { chainId: 5003, rpcProviderUrl: rpcUrl, bundlerProvider });
-            const onRampLink = primeSdk.getFiatOnRamp();
-
+            
+            var onRampLink = "";
+            try {
+                onRampLink = (await primeSdk.getFiatOnRamp()).toString();
+            } catch (error: any) {
+                elizaLogger.error(error.message);
+                onRampLink = error.message.split('no method available for opening\'')[1];
+                onRampLink = onRampLink.split('\'')[0];
+            }
 
             callback({
-                text: `Here you can buy MNT with your prefered pay method. Payment Link: ${onRampLink}`,
-                content: { success: true, onRampLink },
+                text: `Here you can buy MNT with your prefered pay method. Payment Link: ${onRampLink}`
             });
 
             return true;
