@@ -113,3 +113,52 @@ export const createSmartWalletExamples: ActionExample[][] = [
     },
   ],
 ];
+
+
+export const onRampExamples: ActionExample[][] = [
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can I buy crypto with my credit card?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Yes, you can buy crypto using your credit card. Please provide the amount and the cryptocurrency you want to purchase.",
+        action: "ONRAMP",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "I want to buy MNT using PayPal. Can you help?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I can assist you with buying MNT using PayPal. Please confirm the amount you'd like to purchase.",
+        action: "ONRAMP",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Help me purchase Ethereum in Mantle network with my credit card.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "I can help you buy Ethereum in Mantle network using your credit card. Let me know the amount you'd like to purchase.",
+        action: "ONRAMP",
+      },
+    },
+  ],
+];
