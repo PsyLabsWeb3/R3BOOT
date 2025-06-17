@@ -162,3 +162,98 @@ export const onRampExamples: ActionExample[][] = [
     },
   ],
 ];
+
+export const stakeETHExamples: ActionExample[][] = [
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Stake 1 ETH into the mETH staking contract.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I can assist you with staking ETH with mETH contract. Please confirm the amount of you'd like to stake into mETH.",
+        action: "STAKE_ETH",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can you stake 0.5 ETH for me in the mETH staking contract?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I will stake 0.5 ETH in the mETH staking contract for you. Please confirm the details.",
+        action: "STAKE_ETH",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can you stake 3.25 ETH into the mETH staking contract?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I will stake 3.25 ETH into the mETH staking contract for you. Please confirm the details.",
+        action: "STAKE_ETH",
+      },
+    },
+  ],
+];
+export const fetchMETHBalanceExamples: ActionExample[][] = [
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "What is my mETH balance?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Let me check your mETH balance.",
+        action: "FETCH_METH_BALANCE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can you fetch my mETH balance?",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I will fetch your mETH balance.",
+        action: "FETCH_METH_BALANCE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Check the mETH balance for my wallet.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Let me check the mETH balance for your wallet.",
+        action: "FETCH_METH_BALANCE",
+      },
+    },
+  ],
+];

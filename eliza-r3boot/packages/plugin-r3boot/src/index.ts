@@ -3,6 +3,8 @@ import { fetchBalancesAction } from "./actions/fetchBalances";
 import { fetchRecentTransactionsAction } from "./actions/fetchRecentTransactions";
 import { createSmartWalletAction } from "./actions/createSmartWallet";
 import { onRamp } from "./actions/onRamp";
+import { stakeETHAction } from "./actions/stakeETH-mETH";
+import { fetchMETHBalanceAction } from "./actions/fetchMETHBalance";
 
 export const r3bootPlugin: Plugin = {
   name: "r3boot",
@@ -12,6 +14,8 @@ export const r3bootPlugin: Plugin = {
     fetchRecentTransactionsAction,
     createSmartWalletAction,
     onRamp,
+    stakeETHAction,
+    fetchMETHBalanceAction,
   ],
   evaluators: [],
   providers: [],
