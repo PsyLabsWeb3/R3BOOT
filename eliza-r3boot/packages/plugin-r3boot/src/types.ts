@@ -11,4 +11,5 @@ export interface TransactionEntry {
   amount: string;
   status: "Completed" | "Pending";
   timestamp: number;
+  link: string;
 }

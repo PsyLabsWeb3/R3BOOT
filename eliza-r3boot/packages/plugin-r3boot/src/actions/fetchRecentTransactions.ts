@@ -76,7 +76,7 @@ export const fetchRecentTransactionsAction: Action = {
         try {
             // Fetch native MNT transactions
             const nativeRes = await fetch(
-                `${config.MANTLE_EXPLORER_API_URL}?module=account&action=txlist&address=${walletAddress}`
+                `${config.MANTLE_EXPLORER_API_URL}/api?module=account&action=txlist&address=${walletAddress}`
             );
             const nativeJson = (await nativeRes.json()) as BlockscoutResponse<any[]>;
             const nativeTxs: TransactionEntry[] = nativeJson.result.map(
@@ -92,13 +92,14 @@ export const fetchRecentTransactionsAction: Action = {
                         amount: `${(Number(tx.value) / 1e18).toString()} MNT`,
                         status: txStatus,
                         timestamp: Number(tx.timeStamp),
+                        link: `${config.MANTLE_EXPLORER_API_URL}/tx/${tx.hash}`,
                     };
                 }
             );
 
             // Fetch ERC-20 token transactions
             const tokenRes = await fetch(
-                `${config.MANTLE_EXPLORER_API_URL}?module=account&action=tokentx&address=${walletAddress}`
+                `${config.MANTLE_EXPLORER_API_URL}/api?module=account&action=tokentx&address=${walletAddress}`
             );
             const tokenJson = (await tokenRes.json()) as BlockscoutResponse<any[]>;
             const tokenTxs: TransactionEntry[] = tokenJson.result
@@ -118,6 +119,7 @@ export const fetchRecentTransactionsAction: Action = {
                             amount: `${(Number(tx.value) / 10 ** Number(tx.tokenDecimal)).toString()} ${tx.tokenSymbol}`,
                             status: txStatus,
                             timestamp: Number(tx.timeStamp),
+                            link: `${config.MANTLE_EXPLORER_API_URL}/tx/${tx.hash}`,
                         };
                     }
                 );
