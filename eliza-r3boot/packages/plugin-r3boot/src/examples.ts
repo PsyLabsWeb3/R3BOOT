@@ -257,3 +257,128 @@ export const fetchMETHBalanceExamples: ActionExample[][] = [
     },
   ],
 ];
+export const sendR3wireExamples: ActionExample[][] = [
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "I want to send 0.5 ETH using ReWire. The secret is 'mySecret123'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Got it. I will create a ReWire transaction for 0.5 ETH with the provided secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "I want to send 0.5 ETH using r3wire. The secret is 'mySecret123'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Got it. I will create a r3wire transaction for 0.5 ETH with the provided secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Send 1 ETH via ReWire. Use the secret 'secureKey456'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Understood. I will create a ReWire transaction for 1 ETH with the given secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Send 1 ETH via r3wire. Use the secret 'secureKey456'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Understood. I will create a r3wire transaction for 1 ETH with the given secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can you create a ReWire for 2.5 ETH? The secret is 'hiddenPass789'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I will create a ReWire transaction for 2.5 ETH with the specified secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "Can you create a r3wire for 2.5 ETH? The secret is 'hiddenPass789'.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Sure, I will create a r3wire transaction for 2.5 ETH with the specified secret.",
+        action: "SEND_R3WIRE",
+      },
+    },
+  ],
+];
+
+export const claimR3wireExamples: ActionExample[][] = [
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "I want to claim my r3wire. The secret is 'mySecret123' and the salt is 123989213.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Got it. I will claim your r3wire for you.",
+        action: "CLAIM_R3WIRE",
+      },
+    },
+  ],
+  [
+    {
+      user: "{{user1}}",
+      content: {
+        text: "I want to claim my rewire. The secret is 'mySecret123' and the salt is 123989213.",
+      },
+    },
+    {
+      user: "{{agent}}",
+      content: {
+        text: "Got it. I will claim your r3wire for you.",
+        action: "CLAIM_R3WIRE",
+      },
+    },
+  ],
+];
