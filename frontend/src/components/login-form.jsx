@@ -54,7 +54,7 @@ export function LoginForm({ className, ...props }) {
     formData.append("email", email);
     formData.append("password", password);
 
-    const response = fetch("http://159.223.111.198:8000/api/login", {
+    const response = fetch("https://backend.r3boot-ai.xyz/api/login", {
       method: "POST",
       body: formData,
     });

@@ -5,7 +5,15 @@ export function ThemeToggle() {
   // Lee el valor guardado en localStorage o usa 'dark' por defecto
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") || "dark";
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      if (prefersDark == true) {
+        return "dark";
+      } else {
+        return "light";
+      }
     }
     return "dark";
   });
@@ -22,6 +30,7 @@ export function ThemeToggle() {
 
   return (
     <div className="pr-6 pt-2">
+      {" "}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -29,10 +38,10 @@ export function ThemeToggle() {
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="size-4.5"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="size-4.5 cursor-pointer"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

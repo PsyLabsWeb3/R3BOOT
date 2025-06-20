@@ -75,7 +75,7 @@ export function CreateAccountForm({ className, ...props }) {
     formData.append("password", password);
     formData.append("password_confirmation", passwordConfirm);
 
-    const response = fetch("http://159.223.111.198:8000/api/register", {
+    const response = fetch("https://backend.r3boot-ai.xyz/api/register", {
       method: "POST",
       body: formData,
     });

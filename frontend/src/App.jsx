@@ -6,6 +6,7 @@ import { CreateAccountForm } from "@/components/create-account-form";
 import { MyAccount } from "@/components/my-account";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getBalance, getSanctumUser } from "./lib/functions";
+import { TransactionsPage } from "./components/transactions-page";
 
 function App() {
   const router = createBrowserRouter([
@@ -26,6 +27,24 @@ function App() {
           return {
             loader: () => ({ user }),
             Component: MyAccount,
+          };
+        } catch (error) {
+          window.location.href = "/login";
+          return {
+            error: () => <div>Error al cargar la cuenta: {error.message}</div>,
+          };
+        }
+      },
+    },
+    {
+      path: "/my-transactions",
+      lazy: async () => {
+        try {
+          const user = await getSanctumUser();
+
+          return {
+            loader: () => ({ user }),
+            Component: TransactionsPage,
           };
         } catch (error) {
           window.location.href = "/login";

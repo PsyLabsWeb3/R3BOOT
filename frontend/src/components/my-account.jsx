@@ -4,10 +4,13 @@ import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { useLoaderData } from "react-router-dom";
 import Cookies from "js-cookie";
-import { Menu, Wallet } from "lucide-react";
+import { Eye, Icon, Menu, Wallet } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 import { getBalance, getMovements } from "../lib/functions";
 import "./ui/circle-loader.css";
+import { ModalIframe } from "./modals/modal-iframe";
+import { UpdateWalletModal } from "./modals/update-wallet";
+import LoaderSplash from "./animations/loader-splash";
 
 export function MyAccount() {
   const { user, balance } = useLoaderData();
@@ -25,68 +28,56 @@ export function MyAccount() {
   const [loadingBalances, setLoadingBalances] = useState(false);
   const [loadingMovements, setLoadingMovements] = useState(false);
 
-  const exampleMovemenmts = [
-    {
-      type: "Received",
-      amount: "0.5 BTC",
-      status: "Completed",
-    },
-    {
-      type: "Sent",
-      amount: "1.2 ETH",
-      status: "Pending",
-    },
-    {
-      type: "Received",
-      amount: "1000 USDT",
-      status: "Completed",
-    },
-    {
-      type: "Sent",
-      amount: "0.3 BNB",
-      status: "Failed",
-    },
-    {
-      type: "Received",
-      amount: "2.5 BTC",
-      status: "Completed",
-    },
-  ];
-
   const [userTyping, setUserTyping] = useState(false);
   const [agentTyping, setAgentTyping] = useState(false);
   const [message, setMessage] = useState("");
 
   const messagesContainerRef = useRef(null);
+  // Función para hacer scroll hacia abajo
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop =
+          messagesContainerRef.current.scrollHeight;
+      }
+    }, 50);
+  };
 
+  const [urlCrypto, setUrlCrypto] = useState(null);
+  const [modalCrypto, setModalCrypto] = useState(false);
+
+  const [updateModalWallet, setUpdateModalWallet] = useState(false);
+  const [walletInfo, setWalletInfo] = useState(userInfo.wallet);
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  }, [userConversation, userTyping, agentTyping]);
+    scrollToBottom();
+  }, [userConversation, userTyping, agentTyping, message]);
 
   function handleSubmit() {
+    handleSubmitWithMessage(message);
+  }
+
+  function handleSubmitWithMessage(messageToSend) {
     setUserTyping(false);
 
     setUserConversation((prev) => [
       ...prev,
       {
         type: 1,
-        message: message,
+        message: messageToSend,
       },
     ]);
 
     setMessage("");
+    scrollToBottom();
 
     setAgentTyping(true);
 
     const formData = new FormData();
-    formData.append("message", message);
+    formData.append("message", messageToSend);
 
     const cookies = Cookies.get("token");
 
-    fetch("http://159.223.111.198:8000/api/receive-message", {
+    fetch("https://backend.r3boot-ai.xyz/api/receive-message", {
       method: "POST",
       body: formData,
       headers: {
@@ -104,58 +95,145 @@ export function MyAccount() {
           },
         ]);
         setAgentTyping(false);
+        if (data?.action == true) {
+          setUrlCrypto(data?.url);
+          setModalCrypto(true);
+        }
+        if (data?.modal_wallet == true) {
+          setUpdateModalWallet(true);
+          setWalletInfo(userInfo.wallet);
+        }
       })
       .catch(() => setAgentTyping(false));
   }
-
   function handleTyping(event) {
     const inputValue = event.target.value;
-    if (event.target.value == 0) {
+    if (inputValue.length === 0) {
       setUserTyping(false);
     } else {
       setUserTyping(true);
     }
     setMessage(inputValue);
+    scrollToBottom();
   }
 
   useEffect(() => {
-    getBalancesFunction();
+    getBalancesFunction(1);
   }, []);
 
-  async function getBalancesFunction() {
-    setLoadingBalances(true);
-    setLoadingMovements(true);
-    const balances = await getBalance();
+  async function getBalancesFunction(status) {
+    if (userInfo.wallet != null) {
+      setLoadingBalances(true);
+      setLoadingMovements(true);
+      const balances = await getBalance();
 
-    if (balances && balances.balance) {
-      try {
-        const parsed = JSON.parse(balances.balance);
-        setCrypto(parsed);
-      } catch (e) {
-        setCrypto([]);
+      if (balances && balances.balance) {
+        try {
+          const parsed = JSON.parse(balances.balance);
+          setCrypto(parsed);
+        } catch (e) {
+          setCrypto([]);
+        }
+      }
+      setLoadingBalances(false);
+
+      const movements = await getMovements();
+      if (movements && movements.balance) {
+        try {
+          const parsedMovements = JSON.parse(movements.balance);
+          setMovements(parsedMovements);
+        } catch (e) {
+          setMovements([]);
+        }
+      }
+      setLoadingMovements(false);
+    } else {
+      if (status == 2) {
+        setLoadingBalances(true);
+        setLoadingMovements(true);
+        const balances = await getBalance();
+
+        if (balances && balances.balance) {
+          try {
+            const parsed = JSON.parse(balances.balance);
+            setCrypto(parsed);
+          } catch (e) {
+            setCrypto([]);
+          }
+        }
+        setLoadingBalances(false);
+
+        const movements = await getMovements();
+        if (movements && movements.balance) {
+          try {
+            const parsedMovements = JSON.parse(movements.balance);
+            setMovements(parsedMovements);
+          } catch (e) {
+            setMovements([]);
+          }
+        }
+        setLoadingMovements(false);
       }
     }
-    setLoadingBalances(false);
-
-    const movements = await getMovements();
-    if (movements && movements.balance) {
-      try {
-        const parsedMovements = JSON.parse(movements.balance);
-        setMovements(parsedMovements);
-      } catch (e) {
-        setMovements([]);
-      }
-    }
-    setLoadingMovements(false);
   }
 
-  //Actualizar Widgets
-  //Cuando se actualiza la Wallet
-  //Calidar leyendas de cuando no hay wallet -
-  //Loader de cargando transacciones
+  useEffect(() => {
+    if (userInfo.wallet != null) {
+      if (walletInfo != userInfo.wallet) {
+        getBalancesFunction(2);
+      }
+    }
+  }, [walletInfo]);
+  async function createWalletButton() {
+    const newMessage = "Create Wallet";
+    setMessage(newMessage);
+    handleSubmitWithMessage(newMessage);
+  }
+
+  // Animación de puntos para typing
+  function TypingDots() {
+    return (
+      <span className="inline-flex gap-1 items-end h-5">
+        <span className="dot-typing" style={{ animationDelay: "0s" }}>
+          .
+        </span>
+        <span className="dot-typing" style={{ animationDelay: "0.2s" }}>
+          .
+        </span>
+        <span className="dot-typing" style={{ animationDelay: "0.4s" }}>
+          .
+        </span>
+        <style>{`
+        .dot-typing {
+          display: inline-block;
+          font-size: 2rem;
+          line-height: 1;
+          transform: translateY(0);
+          animation: dot-bounce 1s infinite;
+        }
+        @keyframes dot-bounce {
+          0%, 60%, 100% { transform: translateY(0); }
+          30% { transform: translateY(-8px); }
+        }
+      `}</style>
+      </span>
+    );
+  }
 
   return (
     <SidebarProvider>
+      <LoaderSplash />
+      <ModalIframe
+        open={modalCrypto}
+        onCancel={() => setModalCrypto(false)}
+        url={urlCrypto}
+      />
+      <UpdateWalletModal
+        open={updateModalWallet}
+        onCancel={() => setUpdateModalWallet(false)}
+        wallet={walletInfo}
+        setWallet={setWalletInfo}
+      />
       <div className="h-screen overflow-hidden bg-[#e7e7e7] sm:dark:bg-muted dark:bg-black sm:bg-muted sm:flex w-full">
         <div className="sm:hidden flex pt-4 pl-6">
           <button onClick={() => setMenuOpen(true)}>
@@ -166,23 +244,34 @@ export function MyAccount() {
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
           user={userInfo}
+          wallet={walletInfo}
+          setWallet={setWalletInfo}
         />
-        <AppSidebar user={userInfo} getBalancesFunction={getBalancesFunction} />
+        <AppSidebar
+          user={userInfo}
+          getBalancesFunction={getBalancesFunction}
+          wallet={walletInfo}
+          setWallet={setWalletInfo}
+        />
         <main className="w-full">
           <div className="float-start items-center sm:flex h-1/12 sm:ml-4 hidden">
             <SidebarTrigger />
           </div>
-          <div className="sm:flex sm:gap-8 w-full sm:h-11/12 h-full pb-6 pl-6 sm:px-10 dark:bg-black bg-[#e7e7e7] sm:rounded-tl-4xl pt-6 sm:pt-4 sm:py-8">
+          <div className="sm:flex sm:gap-8 w-full sm:h-11/12 h-full pb-6 pl-6 pr-4 sm:pr-0 sm:px-10 dark:bg-black bg-[#e7e7e7] sm:rounded-tl-4xl pt-6 sm:pt-4 sm:py-8">
             <div className="hidden w-1/3 sm:flex sm:flex-col gap-8">
-              <div className="w-full h-full bg-muted rounded-3xl border-2 overflow-scroll pt-2 px-2">
+              <div className="w-full h-full bg-muted rounded-3xl border-2 overflow-y-auto pt-2 px-2">
                 {(loadingBalances || crypto.length === 0) && (
                   <div className="flex flex-1 min-h-[120px] items-center justify-center">
-                    {userInfo.wallet == null ? (
-                      "Add your wallet to display this information."
-                    ) : loadingBalances ? (
+                    {loadingBalances == true ? (
                       <div className="circle-loader" />
+                    ) : userInfo.wallet == null ? (
+                      <span className="text-muted-foreground">
+                        Add your wallet to display this information.
+                      </span>
                     ) : (
-                      "Your wallet doesn't have crypto..."
+                      <span className="text-muted-foreground">
+                        Your wallet doesn't have crypto...
+                      </span>
                     )}
                   </div>
                 )}
@@ -231,12 +320,16 @@ export function MyAccount() {
               <div className="w-full h-full bg-muted border-2 rounded-3xl px-2 overflow-auto">
                 {(loadingMovements || movements.length === 0) && (
                   <div className="flex flex-col items-center justify-center mt-4 h-full">
-                    {userInfo.wallet == null ? (
-                      "Add your wallet to display this information."
-                    ) : loadingMovements ? (
+                    {loadingMovements == true ? (
                       <div className="circle-loader" />
+                    ) : userInfo.wallet == null ? (
+                      <span className="text-muted-foreground">
+                        Add your wallet to display this information.
+                      </span>
                     ) : (
-                      "Your wallet doesn't have transactions."
+                      <span className="text-muted-foreground">
+                        Your wallet doesn't have transactions.
+                      </span>
                     )}
                     <br />
                   </div>
@@ -249,12 +342,12 @@ export function MyAccount() {
                         idx !== movements.length - 1 ? " border-b" : ""
                       }`}
                     >
-                      <div className="w-1/3 flex items-center pl-2">
+                      <div className="w-1/5 flex items-center pl-2">
                         <span className={`text-sm font-normal `}>
                           {movement.type}
                         </span>
                       </div>
-                      <div className="text-left w-1/3">
+                      <div className="text-left w-1/5">
                         <span
                           className="text-sm font-normal line-clamp-1"
                           title={movement.amount}
@@ -262,7 +355,28 @@ export function MyAccount() {
                           {movement.amount}
                         </span>
                       </div>
-                      <div className="text-right w-1/3">
+                      <div className="text-left w-1/5">
+                        <span
+                          className="text-sm font-normal line-clamp-1"
+                          title={`${movement.from} ... ${movement.to}`}
+                        >
+                          {`${movement.from?.slice(-4) || ""} ... ${
+                            movement.to?.slice(-4) || ""
+                          }`}
+                        </span>
+                      </div>
+                      <div className="text-right flex justify-end items-center pr-2 ml-2">
+                        <a
+                          className="text-xs font-normal"
+                          title={movement.amount}
+                          href={movement.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye size={17} className="align-middle" />
+                        </a>
+                      </div>
+                      <div className="text-right w-1/5">
                         <span
                           className={`text-xs font-medium px-2 py-1 rounded-3xl ${
                             movement.status === "Completed"
@@ -279,9 +393,10 @@ export function MyAccount() {
                   ))}
               </div>
             </div>
-            <div className="sm:w-2/3 h-[87vh] sm:h-full flex items-center justify-center bg-muted rounded-3xl p-0 border-0 mr-6 sm:mr-0">
-              <div className="w-full h-full space-y-0 flex flex-col rounded-3xl overflow-hidden shadow-none p-0 bg-muted border-2">
-                <div className="flex flex-row bg-muted items-center justify-between px-6 py-4 m-0 border-b-0">
+            <div className="sm:w-[105vh] w-full h-[87vh] sm:h-full flex items-center justify-center bg-muted rounded-3xl p-0 border-0 sm:mr-0 min-h-[500px]">
+              <div className="w-full h-full space-y-0 flex flex-col rounded-3xl overflow-hidden shadow-none p-0 bg-muted border-2 min-h-[500px]">
+                {/* Header */}
+                <div className="flex flex-row bg-muted items-center justify-between px-6 py-4 m-0 h-[10vh] border-b-0">
                   <div className="flex items-center gap-3">
                     <div className="text-black dark:text-white rounded-full flex items-center justify-center p-1">
                       <svg
@@ -301,56 +416,95 @@ export function MyAccount() {
                     </div>
                     <span className="font-normal text-lg">Agent</span>
                   </div>
-                </div>
-                <div className="flex-1 bg-muted px-6 py-4 relative m-0">
-                  {/* Contenedor de chat con scroll solo en los mensajes, mensajes nuevos abajo */}
-                  <div className="relative h-full w-full flex flex-col justify-end">
-                    <div
-                      className="overflow-auto w-full"
-                      style={{ maxHeight: "calc(100vh - 320px)" }}
-                      ref={messagesContainerRef}
-                    >
-                      <div className="flex flex-col-reverse gap-2 justify-end min-h-[200px]">
-                        {userConversation.length === 0 && (
-                          <div className="text-center text-muted-foreground mt-4">
-                            You don't have any messages yet.
-                          </div>
-                        )}
-                        {userConversation &&
-                          [...userConversation]
-                            .reverse()
-                            .map((message, idx) => (
-                              <div
-                                className={
-                                  message?.type == 0
-                                    ? "self-start bg-[#e9e9e9] dark:bg-[#ffffff20] rounded-lg px-4 py-2 max-w-[75%]"
-                                    : "self-end text-white bg-black dark:bg-white dark:text-black rounded-lg px-4 py-2 max-w-[75%]"
-                                }
-                                key={idx}
-                              >
-                                <span> {message?.message} </span>
-                              </div>
-                            ))}
+                </div>{" "}
+                {/* Body */}{" "}
+                <div
+                  className="px-4 overflow-auto h-[75vh]"
+                  ref={messagesContainerRef}
+                >
+                  <div className="flex flex-col gap-2 min-h-full pb-4">
+                    {userConversation.length === 0 && (
+                      <div className="text-center">
+                        <div className="text-center text-muted-foreground mt-4">
+                          You don't have any messages yet.
+                        </div>
+                        <div className="mt-4">
+                          <button
+                            className="bg-muted text-muted-foreground border-2 px-4 py-2 rounded-lg hover:bg-muted-foreground hover:text-muted transition-colors"
+                            onClick={() => createWalletButton()}
+                          >
+                            Create Wallet
+                          </button>
+                        </div>
                       </div>
-                      {userTyping && (
-                        <div className="flex justify-end">
-                          <div className="mt-4 self-end bg-black text-white dark:text-black dark:bg-white rounded-lg px-4 py-2 max-w-[75%] shadow pointer-events-none">
-                            <span>Typing...</span>
+                    )}
+                    {userConversation &&
+                      userConversation.map((message, idx) => {
+                        let content = message?.message;
+                        let link = null;
+                        if (content && content.includes("Payment Link:")) {
+                          //Explota por el ultimo espacio
+                          const match = content.match(
+                            /Payment Link:\s*(https?:\/\/\S+)/
+                          );
+                          if (match) {
+                            link = match[1];
+                            // Separa el texto antes y después del link
+                            const [before, after] = content.split(match[0]);
+                            content = (
+                              <>
+                                {before}
+                                Payment Link:{" "}
+                                <button
+                                  onClick={() => {
+                                    setUrlCrypto(link);
+                                    setModalCrypto(true);
+                                  }}
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 underline break-all text-left"
+                                >
+                                  {link}
+                                </button>
+                                {after}
+                              </>
+                            );
+                          }
+                        }
+                        return (
+                          <div
+                            className={
+                              message?.type == 0
+                                ? "self-start bg-[#e9e9e9] dark:bg-[#ffffff20] rounded-lg px-4 py-2 max-w-[75%]"
+                                : "self-end text-white bg-black dark:bg-white dark:text-black rounded-lg px-4 py-2 max-w-[75%]"
+                            }
+                            key={idx}
+                          >
+                            <span className="break-words whitespace-pre-line block w-full">
+                              {content}
+                            </span>
                           </div>
+                        );
+                      })}
+                    {userTyping && (
+                      <div className="flex justify-end">
+                        <div className="mt-4 self-end bg-black text-white dark:text-black dark:bg-white rounded-lg px-4 py-2 max-w-[75%] shadow pointer-events-none">
+                          <TypingDots />
                         </div>
-                      )}
-                      {agentTyping && (
-                        <div className="flex justify-start">
-                          <div className="left-4 self-start bg-[#e9e9e9] dark:bg-[#ffffff20] rounded-lg px-4 py-2 max-w-[75%] shadow pointer-events-none">
-                            <span>Agent Typing...</span>
-                          </div>
+                      </div>
+                    )}
+                    {agentTyping && (
+                      <div className="flex justify-start">
+                        <div className="left-4 self-start bg-[#e9e9e9] dark:bg-[#ffffff20] rounded-lg px-4 py-2 max-w-[75%] shadow pointer-events-none">
+                          <span>
+                            <TypingDots />
+                          </span>
                         </div>
-                      )}
-                    </div>
-                    {/* Indicadores typing fuera del scroll */}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <form className="p-4 flex gap-2 bg-muted px-4 ">
+                {/* Footer */}
+                <form className="p-4 flex gap-2 h-[10vh] bg-muted px-4 ">
                   <div className="border-3 w-full flex rounded-lg px-4 py-1 bg-[#fffff20]">
                     <input
                       type="text"

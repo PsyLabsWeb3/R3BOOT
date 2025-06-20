@@ -79,7 +79,7 @@ const itemsAccount = [
   },
 ];
 
-export function AppSidebar({ user, getBalancesFunction }) {
+export function AppSidebar({ user, getBalancesFunction, wallet, setWallet }) {
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {
       return (
@@ -115,35 +115,10 @@ export function AppSidebar({ user, getBalancesFunction }) {
   }
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [wallet, setWallet] = useState(user.wallet || "");
 
-  function saveWallet() {
-    const formData = new FormData();
-    formData.append("wallet", wallet);
-
-    const token = Cookies.get("token");
-
-    fetch("http://159.223.111.198:8000/api/edit-wallet", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // Puedes manejar la respuesta aquí si lo necesitas
-        if (typeof getBalancesFunction === "function") {
-          getBalancesFunction();
-        }
-      })
-      .catch((err) => {
-        // Manejo de errores opcional
-        console.error(err);
-      });
-    setModalOpen(false);
-  }
+  useEffect(() => {
+    getBalancesFunction(2);
+  }, [wallet]);
 
   return (
     <Sidebar className="!bg-muted" collapsible="icon">
@@ -160,21 +135,13 @@ export function AppSidebar({ user, getBalancesFunction }) {
             <option>Mantle</option>
             <option>Ethereum</option>
           </select>
-          <button
-            type="button"
-            title="Agregar Wallet"
-            className="p-0 rounded-full dark:text-white text-black"
-            onClick={() => setModalOpen(true)}
-          >
-            <Plus className="size-6" />
-          </button>
         </div>
         <UpdateWalletModal
           open={modalOpen}
-          onSave={saveWallet}
           onCancel={() => setModalOpen(false)}
           wallet={wallet}
           setWallet={setWallet}
+          getBalancesFunction={getBalancesFunction}
         />
         <SidebarGroup>
           <SidebarGroupLabel>Summary</SidebarGroupLabel>
@@ -182,12 +149,24 @@ export function AppSidebar({ user, getBalancesFunction }) {
             <SidebarMenu>
               {itemsOverview.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="size-4" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
+                  {item.title == "Wallets" ? (
+                    <SidebarMenuButton asChild>
+                      <button
+                        onClick={() => setModalOpen(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </button>
+                    </SidebarMenuButton>
+                  ) : (
+                    <SidebarMenuButton asChild>
+                      <a href={item.url} className="flex items-center gap-2">
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

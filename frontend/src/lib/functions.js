@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 export async function getSanctumUser() {
   const token = Cookies.get("token");
   const response = await fetch(
-    "http://159.223.111.198:8000/api/get-auth-user",
+    "https://backend.r3boot-ai.xyz/api/get-auth-user",
     {
       method: "GET",
       headers: {
@@ -27,13 +27,16 @@ export async function getSanctumUser() {
 
 export async function getBalance() {
   const token = Cookies.get("token");
-  const response = await fetch("http://159.223.111.198:8000/api/get-balance", {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
+  const response = await fetch(
+    "https://backend.r3boot-ai.xyz/api/get-balance",
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    }
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se pudo autenticar con Sanctum.");
@@ -45,7 +48,7 @@ export async function getBalance() {
 export async function getMovements() {
   const token = Cookies.get("token");
   const response = await fetch(
-    "http://159.223.111.198:8000/api/get-movements",
+    "https://backend.r3boot-ai.xyz/api/get-movements",
     {
       method: "GET",
       headers: {
