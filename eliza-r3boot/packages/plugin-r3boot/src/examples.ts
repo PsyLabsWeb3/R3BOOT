@@ -257,7 +257,7 @@ export const fetchMETHBalanceExamples: ActionExample[][] = [
     },
   ],
 ];
-export const sendRewireExamples: ActionExample[][] = [
+export const sendR3wireExamples: ActionExample[][] = [
   [
     {
       user: "{{user1}}",
