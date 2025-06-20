@@ -16,7 +16,7 @@ import { sendR3wireExamples } from "../examples.ts"; // Adjust the path as neces
 export const sendR3wireAction: Action = {
     name: "SEND_R3WIRE",
     similes: ["CREATE_REWIRE", "CREATE_R3WIRE", "SEND_REWIRE"],
-    description: "Create and redeem a R3wire transaction.",
+    description: "Create a R3wire transaction.",
     validate: async (_runtime: IAgentRuntime) => {
         // Add any necessary validation logic here
         return true;
@@ -31,7 +31,7 @@ export const sendR3wireAction: Action = {
         try {
             const RPC_URL = process.env.MANTLE_RPC_URL;
             const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-            const CONTRACT_ADDR = "0x95C5E4274336983600c1079a1f1D0c1Bd9Bc7415";
+            const CONTRACT_ADDR = "0xe68F9c15Fe0e0Fcaece955cdc775ec609A693691";
             const ABI = r3wireABI;
 
             if (!PRIVATE_KEY || !CONTRACT_ADDR) {
@@ -65,7 +65,7 @@ export const sendR3wireAction: Action = {
             const amountInEther = amount.trim();
             const value = parseEther(amountInEther);
 
-            elizaLogger.info(`Amount in Ether: ${value}`);
+            elizaLogger.info(`Parsed amount: ${value}`);
 
             elizaLogger.info(`Extracted secret: ${secret}`);
 
@@ -92,7 +92,7 @@ export const sendR3wireAction: Action = {
 
             return true;
         } catch (error: any) {
-            elizaLogger.error("Error in sendr3wireAction: ", error.message);
+            elizaLogger.error("Error in sendR3wireAction: ", error.message);
             callback({
                 text: `Failed to execute R3wire action: ${error.message}`,
                 content: { error: error.message },

@@ -11,12 +11,12 @@ import {
     ModelClass,
 } from "@elizaos/core";
 import { r3wireABI } from "../constants.ts"; // Adjust the path as necessary
-import { sendR3wireExamples } from "../examples.ts"; // Adjust the path as necessary
+import { claimR3wireExamples } from "../examples.ts"; // Adjust the path as necessary
 
 export const claimR3wireAction: Action = {
-    name: "SEND_R3WIRE",
-    similes: ["CREATE_REWIRE", "CREATE_R3WIRE", "SEND_REWIRE"],
-    description: "Create and redeem a R3wire transaction.",
+    name: "CLAIM_R3WIRE",
+    similes: ["REDEEM_R3WIRE", "CLAIM_REWIRE", "REDEEM_REWIRE"],
+    description: "Redeem a R3wire transaction.",
     validate: async (_runtime: IAgentRuntime) => {
         // Add any necessary validation logic here
         return true;
@@ -31,7 +31,7 @@ export const claimR3wireAction: Action = {
         try {
             const RPC_URL = process.env.MANTLE_RPC_URL;
             const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-            const CONTRACT_ADDR = "0x95C5E4274336983600c1079a1f1D0c1Bd9Bc7415";
+            const CONTRACT_ADDR = "0xe68F9c15Fe0e0Fcaece955cdc775ec609A693691";
             const ABI = r3wireABI;
 
             if (!PRIVATE_KEY || !CONTRACT_ADDR) {
@@ -51,48 +51,34 @@ export const claimR3wireAction: Action = {
                 stop: ["\n"],
             });
 
-            
-            const amountContext = `Extract the user's requested amount to transfer from the user's message. The message is: ${_message.content.text} return only the numeric value clean up any spaces at the beginning or end.`;
-            let amount = await generateText({
+            elizaLogger.info(`Extracted secret: ${secret}`);
+
+            // Extract salt from the user's message
+            const saltContext = `Extract the salt from the user's message. The message is: ${_message.content.text} return only the salt without any additional text. Make sure to clean up any spaces at the beginning or end and trim any apostrophes.`;
+            const salt = await generateText({
                 runtime: _runtime,
-                context: amountContext,
+                context: secretContext,
                 modelClass: ModelClass.SMALL,
                 stop: ["\n"],
             });
 
-            elizaLogger.info(`Extracted RAW amount: ${amount}`);
+            elizaLogger.info(`Extracted salt: ${salt}`);
 
-            const amountInEther = amount.trim();
-            const value = parseEther(amountInEther);
+            // Claim R3wire transaction
+            const txCreate = await r3wire.claimR3wire(secret, salt);
 
-            elizaLogger.info(`Amount in Ether: ${value}`);
-
-            elizaLogger.info(`Extracted secret: ${secret}`);
-
-            // Create salt using random bytes
-            const hexSalt = Buffer.from(randomBytes(16)).toString("hex");
-
-            // Hash the secret
-            const secretHash = solidityPackedKeccak256(["string", "string"], [secret, hexSalt]);
-            elizaLogger.info(`Generated secretHash: ${secretHash}`);
-
-            // Create R3wire transaction
-            const txCreate = await r3wire.createR3wire(secretHash, {
-                value
-            });
-            elizaLogger.info(`Tx createR3wire hash: ${txCreate.hash}`);
+            elizaLogger.info(`Tx claimR3wire hash: ${txCreate.hash}`);
             await txCreate.wait();
-            elizaLogger.info('R3wire created successfully');
-
+            elizaLogger.info('R3wire claimed successfully');
 
             callback({
-                text: `R3wire created successfully. Share the secret with the recipient to redeem it, as well as the salt: ${hexSalt}.`,
+                text: `R3wire claimed successfully. Check your balance to confirm your new funds.`,
                 content: { success: true, createTxHash: txCreate.hash },
             });
 
             return true;
         } catch (error: any) {
-            elizaLogger.error("Error in sendr3wireAction: ", error.message);
+            elizaLogger.error("Error in claimR3wireAction: ", error.message);
             callback({
                 text: `Failed to execute R3wire action: ${error.message}`,
                 content: { error: error.message },
@@ -100,5 +86,5 @@ export const claimR3wireAction: Action = {
             return false;
         }
     },
-    examples: sendR3wireExamples as ActionExample[][],
+    examples: claimR3wireExamples as ActionExample[][],
 } as Action;

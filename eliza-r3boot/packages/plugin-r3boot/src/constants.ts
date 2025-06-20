@@ -21,7 +21,7 @@ export const r3wireABI = [
         "type": "bytes32"
       }
     ],
-    "name": "createReWire",
+    "name": "createR3wire",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -39,7 +39,7 @@ export const r3wireABI = [
         "type": "bytes"
       }
     ],
-    "name": "redeemReWire",
+    "name": "redeemR3wire",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -52,7 +52,7 @@ export const r3wireABI = [
         "type": "bytes32"
       }
     ],
-    "name": "cancelReWire",
+    "name": "cancelR3wire",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -79,7 +79,7 @@ export const r3wireABI = [
         "type": "uint256"
       }
     ],
-    "name": "ReWireCreated",
+    "name": "R3wireCreated",
     "type": "event"
   },
   {
@@ -98,7 +98,7 @@ export const r3wireABI = [
         "type": "address"
       }
     ],
-    "name": "ReWireRedeemed",
+    "name": "R3wireRedeemed",
     "type": "event"
   },
   {
@@ -111,7 +111,7 @@ export const r3wireABI = [
         "type": "bytes32"
       }
     ],
-    "name": "ReWireCanceled",
+    "name": "R3wireCanceled",
     "type": "event"
   },
   {
