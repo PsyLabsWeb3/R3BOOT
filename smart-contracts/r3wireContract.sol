@@ -34,7 +34,7 @@ contract R3wireContract {
         bytes32 secretHash = keccak256(abi.encodePacked(secret, salt));
         R3wire storage v = r3wires[secretHash];
         require(v.amount > 0, "Not found");
-        require(!v.claimed,    "Already claimed");
+        require(!v.claimed, "Already claimed");
 
         v.claimed = true;
         payable(msg.sender).transfer(v.amount);

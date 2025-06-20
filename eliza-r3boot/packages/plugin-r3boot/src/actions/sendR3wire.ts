@@ -31,7 +31,7 @@ export const sendR3wireAction: Action = {
         try {
             const RPC_URL = process.env.MANTLE_RPC_URL;
             const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-            const CONTRACT_ADDR = "0xe68F9c15Fe0e0Fcaece955cdc775ec609A693691";
+            const CONTRACT_ADDR = "0x6b88Aab261293F1eD12f2C92b84Db9C217816816";
             const ABI = r3wireABI;
 
             if (!PRIVATE_KEY || !CONTRACT_ADDR) {
@@ -51,7 +51,6 @@ export const sendR3wireAction: Action = {
                 stop: ["\n"],
             });
 
-            
             const amountContext = `Extract the user's requested amount to transfer from the user's message. The message is: ${_message.content.text} return only the numeric value clean up any spaces at the beginning or end.`;
             let amount = await generateText({
                 runtime: _runtime,

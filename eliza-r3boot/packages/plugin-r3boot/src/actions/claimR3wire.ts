@@ -31,7 +31,7 @@ export const claimR3wireAction: Action = {
         try {
             const RPC_URL = process.env.MANTLE_RPC_URL;
             const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
-            const CONTRACT_ADDR = "0xe68F9c15Fe0e0Fcaece955cdc775ec609A693691";
+            const CONTRACT_ADDR = "0x6b88Aab261293F1eD12f2C92b84Db9C217816816";
             const ABI = r3wireABI;
 
             if (!PRIVATE_KEY || !CONTRACT_ADDR) {
@@ -57,15 +57,19 @@ export const claimR3wireAction: Action = {
             const saltContext = `Extract the salt from the user's message. The message is: ${_message.content.text} return only the salt without any additional text. Make sure to clean up any spaces at the beginning or end and trim any apostrophes.`;
             const salt = await generateText({
                 runtime: _runtime,
-                context: secretContext,
+                context: saltContext,
                 modelClass: ModelClass.SMALL,
                 stop: ["\n"],
             });
 
             elizaLogger.info(`Extracted salt: ${salt}`);
 
+            // Parse secret and salt into bytes32 solidity
+            const secretBytes32 = ethers.toUtf8Bytes(secret);
+            const saltBytes32 = ethers.toUtf8Bytes(salt);
+
             // Claim R3wire transaction
-            const txCreate = await r3wire.claimR3wire(secret, salt);
+            const txCreate = await r3wire.redeemR3wire(secretBytes32, saltBytes32);
 
             elizaLogger.info(`Tx claimR3wire hash: ${txCreate.hash}`);
             await txCreate.wait();
