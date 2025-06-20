@@ -5,6 +5,7 @@ import { createSmartWalletAction } from "./actions/createSmartWallet";
 import { onRamp } from "./actions/onRamp";
 import { stakeETHAction } from "./actions/stakeETH-mETH";
 import { fetchMETHBalanceAction } from "./actions/fetchMETHBalance";
+import { sendRewireAction } from "./actions/sendRewire";
 
 export const r3bootPlugin: Plugin = {
   name: "r3boot",
@@ -16,6 +17,7 @@ export const r3bootPlugin: Plugin = {
     onRamp,
     stakeETHAction,
     fetchMETHBalanceAction,
+    sendRewireAction,
   ],
   evaluators: [],
   providers: [],
