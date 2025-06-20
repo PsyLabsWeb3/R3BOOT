@@ -1,4 +1,4 @@
-import { ethers, keccak256, toUtf8Bytes } from 'ethers';
+import { ethers, solidityKeccak256, solidityPacked, toUtf8Bytes, randomBytes } from 'ethers';
 import {
     elizaLogger,
     Action,
@@ -43,7 +43,7 @@ export const sendRewireAction: Action = {
             const rewire = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
 
             // Extract secret from the user's message
-            const secretContext = `Extract the secret from the user's message. The message is: ${_message.content.text}`;
+            const secretContext = `Extract the secret from the user's message. The message is: ${_message.content.text} return only the secret without any additional text. Make sure to clean up any spaces at the beginning or end and trim any apostrophes.`;
             const secret = await generateText({
                 runtime: _runtime,
                 context: secretContext,
@@ -62,12 +62,14 @@ export const sendRewireAction: Action = {
 
             elizaLogger.info(`Extracted RAW amount: ${amount}`);
 
-
-
             elizaLogger.info(`Extracted secret: ${secret}`);
 
+            // Create salt using random bytes
+            const salt = randomBytes(32);
+            const hexSalt = Buffer.from(randomBytes(16)).toString("hex");
+
             // Hash the secret
-            const secretHash = keccak256(toUtf8Bytes(secret));
+            const secretHash = keccak256(["string", "string"], [secret, hexSalt]);
             elizaLogger.info(`Generated secretHash: ${secretHash}`);
 
             // Create ReWire transaction
@@ -81,7 +83,7 @@ export const sendRewireAction: Action = {
 
 
             callback({
-                text: `ReWire created and redeemed successfully. Transaction hashes: createReWire - ${txCreate.hash},`,
+                text: `ReWire created and redeemed successfully.`,
                 content: { success: true, createTxHash: txCreate.hash },
             });
 
@@ -95,5 +97,5 @@ export const sendRewireAction: Action = {
             return false;
         }
     },
-    examples: sendRewireExamples as ActionExample[][], // Add examples if needed
+    examples: sendRewireExamples as ActionExample[][],
 } as Action;
